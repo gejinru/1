@@ -1,0 +1,354 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>What Should I Eat for Lunch?</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+
+        .container {
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            padding: 40px;
+            max-width: 600px;
+            width: 100%;
+        }
+
+        h1 {
+            color: #333;
+            text-align: center;
+            margin-bottom: 10px;
+            font-size: 2.5em;
+        }
+
+        .subtitle {
+            text-align: center;
+            color: #666;
+            margin-bottom: 30px;
+            font-size: 1.1em;
+        }
+
+        .button-group {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+            margin-bottom: 30px;
+        }
+
+        button {
+            padding: 15px 20px;
+            border: none;
+            border-radius: 10px;
+            font-size: 1em;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            grid-column: 1 / -1;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(102, 126, 234, 0.4);
+        }
+
+        .btn-category {
+            background: #f0f0f0;
+            color: #333;
+            border: 2px solid #e0e0e0;
+        }
+
+        .btn-category:hover {
+            background: #667eea;
+            color: white;
+            border-color: #667eea;
+        }
+
+        .btn-category.active {
+            background: #667eea;
+            color: white;
+            border-color: #667eea;
+        }
+
+        .result-section {
+            display: none;
+            animation: slideIn 0.5s ease;
+        }
+
+        .result-section.show {
+            display: block;
+        }
+
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .lunch-result {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 40px;
+            border-radius: 15px;
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        .lunch-result h2 {
+            font-size: 1.3em;
+            margin-bottom: 15px;
+            opacity: 0.9;
+        }
+
+        .lunch-result .meal-name {
+            font-size: 3em;
+            font-weight: bold;
+            margin: 20px 0;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.2);
+        }
+
+        .lunch-result .emoji {
+            font-size: 4em;
+            margin: 15px 0;
+        }
+
+        .lunch-result .description {
+            font-size: 1.1em;
+            margin-top: 15px;
+            font-style: italic;
+        }
+
+        .button-group-secondary {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+        }
+
+        .btn-secondary {
+            padding: 12px 20px;
+            border: none;
+            border-radius: 10px;
+            font-size: 0.95em;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .btn-secondary.retry {
+            background: #667eea;
+            color: white;
+        }
+
+        .btn-secondary.retry:hover {
+            background: #764ba2;
+            transform: translateY(-2px);
+        }
+
+        .btn-secondary.reset {
+            background: #e0e0e0;
+            color: #333;
+        }
+
+        .btn-secondary.reset:hover {
+            background: #d0d0d0;
+            transform: translateY(-2px);
+        }
+
+        .categories {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        .info-section {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 10px;
+            margin-top: 20px;
+            border-left: 4px solid #667eea;
+        }
+
+        .info-section h3 {
+            color: #333;
+            margin-bottom: 10px;
+        }
+
+        .info-section p {
+            color: #666;
+            line-height: 1.6;
+            font-size: 0.95em;
+        }
+
+        @media (max-width: 600px) {
+            .container {
+                padding: 25px;
+            }
+
+            h1 {
+                font-size: 2em;
+            }
+
+            .lunch-result .meal-name {
+                font-size: 2.2em;
+            }
+
+            .lunch-result .emoji {
+                font-size: 3em;
+            }
+
+            .categories {
+                grid-template-columns: 1fr;
+            }
+
+            .button-group {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🍽️ Lunch Picker</h1>
+        <p class="subtitle">Can't decide what to eat? Let us help!</p>
+
+        <div id="mainScreen">
+            <div class="categories">
+                <button class="btn-category" onclick="selectCategory('all')">All Meals</button>
+                <button class="btn-category" onclick="selectCategory('pizza')">🍕 Pizza</button>
+                <button class="btn-category" onclick="selectCategory('burger')">🍔 Burgers</button>
+                <button class="btn-category" onclick="selectCategory('salad')">🥗 Salads</button>
+                <button class="btn-category" onclick="selectCategory('asian')">🍜 Asian</button>
+                <button class="btn-category" onclick="selectCategory('sandwich')">🥪 Sandwiches</button>
+            </div>
+            <button class="btn-primary" onclick="suggestLunch()">Suggest a Lunch! 🎲</button>
+        </div>
+
+        <div id="resultScreen" class="result-section">
+            <div class="lunch-result">
+                <h2>Today's Lunch Suggestion</h2>
+                <div class="emoji" id="emoji">🍽️</div>
+                <div class="meal-name" id="mealName">Delicious Meal</div>
+                <div class="description" id="description">A tasty option for you</div>
+            </div>
+
+            <div class="button-group-secondary">
+                <button class="btn-secondary retry" onclick="suggestLunch()">Try Another! 🔄</button>
+                <button class="btn-secondary reset" onclick="resetApp()">Back</button>
+            </div>
+        </div>
+
+        <div class="info-section">
+            <h3>💡 Pro Tip</h3>
+            <p>Can't make up your mind? Select a category first, then click "Suggest a Lunch!" to get a random meal from that category. Or leave it on "All Meals" for a complete surprise!</p>
+        </div>
+    </div>
+
+    <script>
+        let selectedCategory = 'all';
+
+        const meals = {
+            all: [
+                { name: 'Pizza Margherita', emoji: '🍕', description: 'Classic Italian pizza with fresh basil and mozzarella' },
+                { name: 'Cheeseburger', emoji: '🍔', description: 'Juicy burger with melted cheese and fresh toppings' },
+                { name: 'Caesar Salad', emoji: '🥗', description: 'Crispy romaine lettuce with parmesan and croutons' },
+                { name: 'Ramen', emoji: '🍜', description: 'Delicious Japanese noodle soup with broth and toppings' },
+                { name: 'Club Sandwich', emoji: '🥪', description: 'Triple-decker sandwich with bacon, turkey, and lettuce' },
+                { name: 'Pad Thai', emoji: '🍜', description: 'Stir-fried rice noodles with shrimp and peanuts' },
+                { name: 'Sushi Roll', emoji: '🍣', description: 'Fresh fish and vegetables wrapped in seasoned rice' },
+                { name: 'Tacos', emoji: '🌮', description: 'Soft or hard shell tacos with your choice of fillings' },
+                { name: 'Falafel Wrap', emoji: '🌯', description: 'Chickpea fritters with hummus and fresh vegetables' },
+                { name: 'Grilled Chicken', emoji: '🍗', description: 'Tender grilled chicken breast with seasonal vegetables' },
+                { name: 'Fish & Chips', emoji: '🍟', description: 'Crispy battered fish with golden french fries' },
+                { name: 'Pasta Carbonara', emoji: '🍝', description: 'Creamy Italian pasta with bacon and parmesan' }
+            ],
+            pizza: [
+                { name: 'Pizza Margherita', emoji: '🍕', description: 'Classic Italian pizza with fresh basil and mozzarella' },
+                { name: 'Pepperoni Pizza', emoji: '🍕', description: 'Crispy pizza loaded with pepperoni' },
+                { name: 'Vegetarian Pizza', emoji: '🍕', description: 'Fresh veggies and mozzarella on a thin crust' },
+                { name: 'BBQ Chicken Pizza', emoji: '🍕', description: 'Tender chicken with BBQ sauce and red onions' }
+            ],
+            burger: [
+                { name: 'Cheeseburger', emoji: '🍔', description: 'Juicy burger with melted cheese and fresh toppings' },
+                { name: 'Bacon Burger', emoji: '🍔', description: 'Double patty with crispy bacon and special sauce' },
+                { name: 'Mushroom Swiss Burger', emoji: '🍔', description: 'Sautéed mushrooms with melted Swiss cheese' },
+                { name: 'Spicy Burger', emoji: '🍔', description: 'Juicy patty with jalapeños and spicy mayo' }
+            ],
+            salad: [
+                { name: 'Caesar Salad', emoji: '🥗', description: 'Crispy romaine lettuce with parmesan and croutons' },
+                { name: 'Greek Salad', emoji: '🥗', description: 'Fresh tomatoes, cucumbers, olives, and feta cheese' },
+                { name: 'Caprese Salad', emoji: '🥗', description: 'Tomato, mozzarella, basil with balsamic vinegar' },
+                { name: 'Quinoa Salad', emoji: '🥗', description: 'Protein-packed quinoa with veggies and vinaigrette' }
+            ],
+            asian: [
+                { name: 'Ramen', emoji: '🍜', description: 'Delicious Japanese noodle soup with broth and toppings' },
+                { name: 'Pad Thai', emoji: '🍜', description: 'Stir-fried rice noodles with shrimp and peanuts' },
+                { name: 'Sushi Roll', emoji: '🍣', description: 'Fresh fish and vegetables wrapped in seasoned rice' },
+                { name: 'Fried Rice', emoji: '🍚', description: 'Fluffy rice stir-fried with vegetables and egg' }
+            ],
+            sandwich: [
+                { name: 'Club Sandwich', emoji: '🥪', description: 'Triple-decker sandwich with bacon, turkey, and lettuce' },
+                { name: 'Turkey Sandwich', emoji: '🥪', description: 'Sliced turkey with cranberry sauce on wheat bread' },
+                { name: 'Falafel Wrap', emoji: '🌯', description: 'Chickpea fritters with hummus and fresh vegetables' },
+                { name: 'Italian Sub', emoji: '🥪', description: 'Sliced meats, cheese, and peppers on crusty bread' }
+            ]
+        };
+
+        function selectCategory(category) {
+            selectedCategory = category;
+            document.querySelectorAll('.btn-category').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            event.target.classList.add('active');
+        }
+
+        function suggestLunch() {
+            const mealList = meals[selectedCategory];
+            const randomMeal = mealList[Math.floor(Math.random() * mealList.length)];
+
+            document.getElementById('emoji').textContent = randomMeal.emoji;
+            document.getElementById('mealName').textContent = randomMeal.name;
+            document.getElementById('description').textContent = randomMeal.description;
+
+            document.getElementById('mainScreen').style.display = 'none';
+            document.getElementById('resultScreen').classList.add('show');
+        }
+
+        function resetApp() {
+            document.getElementById('resultScreen').classList.remove('show');
+            document.getElementById('mainScreen').style.display = 'block';
+            selectedCategory = 'all';
+            document.querySelectorAll('.btn-category').forEach(btn => {
+                btn.classList.remove('active');
+            });
+        }
+    </script>
+</body>
+</html>
